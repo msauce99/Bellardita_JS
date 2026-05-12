@@ -136,6 +136,9 @@ def main():
         # camera state
         "camera_running": False,
 
+        # external TTL trigger flag (set by serial reader when Arduino sees rising edge on pin 2)
+        "ttl_trigger_pending": False,
+
         # nose poke state
         "nose_poke_present": False,
         "nose_poke_prev": False,
@@ -281,6 +284,10 @@ def main():
                             except queue.Empty:
                                 break
                         return _AUTO_COMPLETE
+                    if shared_state.get("ttl_trigger_pending", False):
+                        shared_state["ttl_trigger_pending"] = False
+                        print("[TTL] External TTL trigger received — starting trial.")
+                        return ""
                     try:
                         return _input_q.get(timeout=0.3)
                     except queue.Empty:
@@ -294,9 +301,9 @@ def main():
                     if DEBUG:
                         print("[DEBUG] Auto-starting next session after restart='y'.")
                 elif TRAINING_MODE:
-                    result = _wait_input("\nPress Enter to START training session (Ctrl+C to quit): ")
+                    result = _wait_input("\nPress Enter to START training session, or start neural imaging (TTL on pin 2 will auto-start) (Ctrl+C to quit): ")
                 else:
-                    result = _wait_input("\nPress Enter to START trial (Ctrl+C to quit): ")
+                    result = _wait_input("\nPress Enter to START trial, or start neural imaging (TTL on pin 2 will auto-start) (Ctrl+C to quit): ")
 
                 if result is None:
                     if DEBUG:

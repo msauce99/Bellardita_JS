@@ -8,7 +8,8 @@ const int joystickX = A0;          // Analog pin A0 for joystick X axis
 const int joystickY = A1;          // Analog pin A1 for joystick Y axis
 const int camTriggerPin = 8;       // Digital pin 8 for camera TTL trigger
 const int nosePokePin = 7;         // Digital pin 7 for nose poke signal
-// const int pertPin = 4;               // Digital pin 2 for perturbation signal
+const int ttlInputPin = 2;         // Digital pin 2 for external TTL trial trigger (INPUT_PULLUP, active-low: idles HIGH, trigger on LOW)
+// const int pertPin = 4;               // Digital pin 4 for perturbation signal
 // ------------------------------------------------------------------------------------
 
 // ------------------------------------------------------------------------------------
@@ -36,6 +37,11 @@ uint32_t lastCamTriggerUs = 0;
 // ------------------------------------------------------------------------------------
 int x_base = 0;
 int y_base = 0;
+
+// ------------------------------------------------------------------------------------
+// TTL TRIGGER STATE
+// ------------------------------------------------------------------------------------
+bool lastTtlState = HIGH;  // idle state with INPUT_PULLUP is HIGH
 // ------------------------------------------------------------------------------------
 
 // ------------------------------------------------------------------------------------
@@ -109,6 +115,8 @@ void setup() {
   pinMode(camTriggerPin, OUTPUT);
   digitalWrite(camTriggerPin, LOW);
 
+  pinMode(ttlInputPin, INPUT_PULLUP);
+
   // Nose poke input:
   // Use INPUT (pull-up in circuitry)
   // HIGH  = 1 = beam blocked  = mouse nose present
@@ -141,6 +149,13 @@ void setup() {
 }
 
 void loop() {
+  // Detect falling edge on TTL input pin (active-low: idles HIGH, trigger on HIGH->LOW)
+  bool ttlState = (digitalRead(ttlInputPin) == HIGH);
+  if (!ttlState && lastTtlState) {
+    Serial.println("TTL_START");
+  }
+  lastTtlState = ttlState;
+
   // Wait for 'S' command to start session/trial
   if (!Serial.available()) {
     return;

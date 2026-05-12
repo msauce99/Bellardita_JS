@@ -220,6 +220,15 @@ def _serial_reader(ser, stop_event, shared_state: dict):
                 continue
 
             # --------------------------------------------------
+            # External TTL trigger from Arduino (rising edge on pin 2)
+            # --------------------------------------------------
+            if line_raw == "TTL_START":
+                shared_state["ttl_trigger_pending"] = True
+                if DEBUG:
+                    print("[TTL] External TTL trigger received — queuing trial start.")
+                continue
+
+            # --------------------------------------------------
             # Nose poke event messages from Arduino
             # Format:
             #   NOSE_POKE:1 (nose present in hole)
