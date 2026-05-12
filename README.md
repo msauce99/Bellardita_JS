@@ -50,7 +50,7 @@ Central configuration file. Edit to customize:
   - save directory
   - training stage
 
-### Core Visualization (`Joystick_Pos.py`)
+### Core Visualization (`joystick_pos.py`)
 **Main Functions:**
 - `figure_setup()` — creates matplotlib figure and artists
 - `make_update()` — builds animation callback function
@@ -97,11 +97,12 @@ Arduino TTL pulse generation for hardware camera triggering:
 - `stop_camera()` — sends `'c'` to Arduino to stop TTL pulses
 - used by training and trial controllers, and can also be toggled manually from the GUI / terminal when enabled
 
-### Utility Functions (`math_utils.py`)
+### Utility Functions (`helpers.py`)
 - `dist2()` — squared Euclidean distance
 - `parse_xy()` — parses `X,Y` string from Arduino
 - `raw_to_volts()` — converts ADC counts to voltage
 - `volts_to_mm()` — converts voltage to joystick displacement using calibration factors
+- `make_unique_csv_name()` — builds a unique, timestamped CSV path under `JOYSTICK_SAVE_DIR` using the subject/session metadata fields from `configurations.py`
 
 ### Main Entrypoint (`main.py`)
 1. Loads the active hardware profile from `configurations.py`
